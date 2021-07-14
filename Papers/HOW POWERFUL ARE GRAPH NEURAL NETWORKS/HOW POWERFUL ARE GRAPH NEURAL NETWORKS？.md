@@ -59,3 +59,80 @@
 
 ## Theoretical framework: overview
 
+* assume node input features are from a countable universe
+
+  node features from deeper layers of any fixed model are also from a countable universe
+
+  assign each feature vector a unique label in $\{a,b,c...\}$
+
+* Definition(Multiset): a multiset is a 2-tuple $X=(S,m)$ where $S$ is the underlying set of $X$ that is formed from its $distinct\ elements$, and $m: S \rightarrow \N_{\geq 1}$ gives the $multiplicity$ of the elements
+
+* never map two neighborhoods to the same representation $\Rightarrow$ *injective* aggregation
+
+## Building powerful graph neural networks
+
+* Lemma 2: Let $G_1$ and $G_2$ be any two non-isomorphic graphs. If a graph neural network $\mathcal{A}:\mathcal{G}\rightarrow\R^d$  maps $G_1$ and $G_2$ to different embeddings, the Weifeiler-Lehman graph isomorphism test also decides $G_1$ and $G_2$ are not isomorphic.
+
+* Theorem 3: Let $\mathcal{A}:\mathcal{G}\rightarrow\R^d$ be a GNN. With a sufficient number of GNN layers, $\mathcal{A}$ maps any graphs $G_1$ and $G_2$ that the Weisfeiler-Lehman test of isomorphism decides as non-isomorphic, to different embeddings if the following conditions hold:
+
+  * $\mathcal{A}$ aggregates and updates node features iteratively with
+    $$
+    h_v^{(k)}=\phi(h_v^{(k-1)},f(\{h_u^{(k-1)}:u\in \mathcal{N}(v)\}))
+    $$
+    where the function $f$, which operates on multisets, and $\phi$ are injective.
+
+  * $\mathcal{A}$'s graph-level readout, which operates on the multiset of node features $\{h_v^{(k)}\}$, is injective.
+
+* Lemma 4: Assume the input feature space, $\mathcal{X}$ is countable. Let $g^{(k)}$ be the function parameterized by a GNN's k-th layer for $k=1,...,L$, where $g^{(1)}$ is defined on multisets $X \subset \mathcal{X}$ of bounded size. The range of $g^{(k)}$, i.e., the space of node hidden features $h_v^{(k)}$, is also countable for all $k=1,...,L.$
+
+* Distinguish different graphs $\Rightarrow$ capture similarity of graph structure
+
+1. Graph isomorphism network(GIN)
+
+   * Lemma 5: Assume $\mathcal{X}$ is countable. There exists a function $f:\mathcal{X}\rightarrow\R^n$ so that $h(X) = \sum_{x \in X}f(x)$ is unique for each multiset $X \sub \mathcal{X}$ of bounded size. Moreover, any multiset function $g$ can be decomposed as $G(X)=\phi (\sum_{x\in X}f(x))$ for some function $\phi$.
+
+   * Corollary 6: Assume $\mathcal{X}$ is countable. There exists a function $f: \mathcal{X}\rightarrow \R^n$ so that for infinitely mant choices of $\varepsilon$, include all irrational numbers, $h(c, X) = (1+\varepsilon)\cdot f(c) + \sum_{x \in X}f(x)$ is unique for each pair $(c,X)$, where $c \in \mathcal{X}$ and $X \subset \mathcal{X}$ is a maltiset of bounded size. Moreover, ant function $g$ over such pairs can be decomposed as $g(c,X) = \varphi((1+\varepsilon)\cdot f(c)+\sum_{x \in X}f(x))$ for some function $\varphi$.
+
+   * According to the universal approximation theorem:
+     $$
+     h_v^{(k)}=\text{MLP}^{(k)}((1+\varepsilon^{(k)})\cdot h_v^{k-1}+\sum_{u\in\mathcal{N}(v)}h_u^{(k-1)}).
+     $$
+
+2. Graph-level readout of GIN
+   $$
+   h_G = \text{CONCAT}(\text{READOUT}(\{h_v^{(k)}|v\in G\})\ |\ k=0,1,...,K).
+   $$
+   GIN replaces READOUT with summing all node features from the same iterations
+
+## Less powerful but still intersting GNNs
+
+* Two aspects of the aggregator in the equation
+  * 1-layer perceptrons instead of MLPs
+  * mean or max-pooling instead of the sum
+
+1. 1-layer perceptrons are not sufficient
+
+   * 1-perceptron $\sigma \circ W$: a linear mapping followed by a non-linear activation function such as a ReLU.
+   * Lemma 7: There exist finite multisets $X_1 \neq X_2$ so that for any linear mapping $W$, $\sum_{x\in X_1}\text{ReLU}(Wx)=\sum_{x\in X_2}\text{ReLU}(Wx).$
+
+2. Structures that confuse mean and max-pooling
+
+3. Mean learns distributions
+
+   Corollary 8: Assume $\mathcal{X}$ is countable. There exists a function $f:\mathcal{X}\rightarrow\R^n$ so that $h(X) = \frac{1}{|X|}\sum_{x\in X}f(x), h(X_1) = h(X_2)$ if and onlye if multisets $X_1$ and $X_2$ have the same distribution. That is, assuming $|X_2| \geq |X_1|$, we have $X_1 = (S,m)$ and $X_2 = (S, k \cdot m)$ for some $k \in \N_{\geq 1}.$
+
+4. Max-pooling learns sets witj distinct elements
+
+   Corollary 9: Assume $\mathcal{X}$ is countable. Then there exists a function $f:\mathcal{X}\rightarrow\R^{\infty}$ so that for $h(X) = \max_{x\in X}f(x), h(X_1)=h(X_2)$ if and only if $X_1$ and $X_2$ have the same underlying set.
+
+5. Remarks on other aggregators
+
+   * weighted average via attention
+   * LSTM pooling
+
+## Other related work
+
+## Experiments
+
+## Conclusion
+
